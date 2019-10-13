@@ -1,6 +1,7 @@
 #lang racket
 
 (provide student create-student create-students)
+(require "utils.rkt")
 
 (define (student id name sex ethnicity age)
   (letrec ((get-id (lambda () id))
@@ -9,6 +10,11 @@
            (get-ethnicity (lambda () ethnicity))
            (get-age (lambda () age))
            (type-of (lambda () 'student))
+           (print-info (lambda () (display-all
+                                   "id: " (get-id) "\n"
+                                   "name: " (get-name) "\n"
+                                   "sex: " (get-sex) "\n"
+                                   "age: " (get-age) "\n")))
           )
     (lambda (message)
       (cond ((eq? message 'get-id) get-id)
@@ -17,6 +23,7 @@
             ((eq? message 'get-ethnicity) get-ethnicity)
             ((eq? message 'get-age) get-age)
             ((eq? message 'type-of) type-of)
+            ((eq? message 'print) print-info)
             (else (error "Message not understood"))))))
 
 (define (parse-id lst)

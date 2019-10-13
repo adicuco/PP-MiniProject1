@@ -28,5 +28,5 @@
 ;(send 'get-name (send 'find-student group2 (lambda (student) (equal? (send 'get-sex student) "female"))))
 ;(length (send 'find-students group2 (lambda (student) (equal? (send 'get-sex student) "male"))))
 
-(display "male: ") (length (find-all-in-list (lambda (student) (equal? (send 'get-sex student) "male")) students))
-(display "ethnicity: ") (length (find-all-in-list (lambda (student) (equal? (send 'get-ethnicity student) "Danish")) students))
+;(display "male: ") (length (find-all-in-list (lambda (student) (equal? (send 'get-sex student) "male")) students))
+;(display "ethnicity: ") (length (find-all-in-list (lambda (student) (equal? (send 'get-ethnicity student) "Danish")) students))
