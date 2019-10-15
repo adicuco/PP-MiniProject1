@@ -3,7 +3,7 @@
 (require "utils.rkt")
 (require "group.rkt")
 
-(provide grouping create-random-grouping create-counting-grouping)
+(provide grouping create-random-grouping create-counting-grouping create-counting)
 
 (define (grouping groups students-count)
   (letrec ((get-groups (lambda () groups))
@@ -24,6 +24,19 @@
             ((eq? message 'print) print-info)
             (else (error "Message not understood"))))))
 
+;------------------------------ Parsers ------------------------------
+(define (parse-associative-helper lst stds)
+  (map (lambda (std)
+         (find-first-in-list (lambda (st) (equal? (cdr std) (send 'get-id st))) stds)) lst))
+
+(define (parse-associative lst stds [index 1])
+  (let ((new-group (filter (lambda (grp) (equal? (car grp) index)) lst)))
+    (if (null? new-group)
+        '()
+        (cons (group index (parse-associative-helper new-group stds))
+              (parse-associative lst stds (+ index 1))))))
+ 
+;------------------------------ Ranndom Grouping ------------------------------
 (define (create-random-grouping-helper sl gsl [index 1])
   (let* ((randomized-list (shuffle sl))
          (new-group (first-n-elements randomized-list gsl))
@@ -35,8 +48,16 @@
 
 (define (create-random-grouping sl gsl)
   (grouping (create-random-grouping-helper sl gsl) (length sl)))
+  
 
-(define a '(1 2 3 4 5 6 7 8 9 10 11))
+;------------------------------ Counting Grouping ------------------------------
+(define (create-counting-helper stds k [index 1])
+  (cond ((null? stds) '())
+        ((equal? (+ k 1) index) (create-counting-helper stds k 1))
+        (else (cons (cons index (send 'get-id (first stds))) (create-counting-helper (rest stds) k (+ index 1))))))
+
+(define (create-counting sl gsl)
+  (grouping (parse-associative (create-counting-helper sl gsl) sl) (length sl)))
 
 (define (create-counting-group-helper sl gsl k index)
   (if (null? (nth-element sl k))

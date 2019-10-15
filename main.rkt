@@ -19,8 +19,15 @@
 
 ;counting grouping
 (display 'grouping-counting) (newline)
-(define grouping-counting (create-counting-grouping students 7))
+(define grouping-counting (create-counting students 7))
 (send 'print grouping-counting)
+
+(newline)
+
+;counting grouping-alternative
+(display 'grouping-counting-alternative) (newline)
+(define grouping-counting-alternative (create-counting-grouping students 7))
+(send 'print grouping-counting-alternative)
 
 (define groups2 (send 'get-groups grouping-counting))
 (define group2 (car groups2))
@@ -30,3 +37,13 @@
 
 ;(display "male: ") (length (find-all-in-list (lambda (student) (equal? (send 'get-sex student) "male")) students))
 ;(display "ethnicity: ") (length (find-all-in-list (lambda (student) (equal? (send 'get-ethnicity student) "Danish")) students))
+
+(define all-eths (get-eths students))
+
+
+;(define (create-balanced-group-helper lst grp eths k [index 1])
+; (for-each (lambda (eth)
+;              (let ((males (find-all-in-list (lambda (student) (equal? (send 'get-sex student) "male")) lst)))
+;                    (create-balanced-group-add-helper males k index))) eths))
+;                                
+  

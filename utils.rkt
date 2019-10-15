@@ -3,7 +3,8 @@
 (provide send file-read-all display-all
          find-first-in-list find-all-in-list
          first-n-elements last-n-elements nth-element
-         maximum-group-size minimum-group-size)
+         maximum-group-size minimum-group-size
+         get-eths)
 
 (define (send message obj . par)
   (let ((method (obj message)))
@@ -62,3 +63,10 @@
 
 (define (display-all . vs)
   (for-each display vs))
+
+(define (get-eths lst [ethnicities '()])
+  (if (null? lst)
+      ethnicities
+      (let ((eth (send 'get-ethnicity (first lst))))
+        (get-eths (filter (lambda (std) (not (equal? (send 'get-ethnicity std) eth))) lst) (cons eth ethnicities)))))
+
