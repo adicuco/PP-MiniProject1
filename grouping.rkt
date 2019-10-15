@@ -3,7 +3,8 @@
 (require "utils.rkt")
 (require "group.rkt")
 
-(provide grouping create-random-grouping create-counting-grouping create-counting)
+(provide grouping create-random-grouping create-counting-grouping create-counting
+         create-balanced-grouping)
 
 (define (grouping groups students-count)
   (letrec ((get-groups (lambda () groups))
@@ -59,6 +60,7 @@
 (define (create-counting sl gsl)
   (grouping (parse-associative (create-counting-helper sl gsl) sl) (length sl)))
 
+;------------------------------ Counting Grouping Alternative ------------------------------
 (define (create-counting-group-helper sl gsl k index)
   (if (null? (nth-element sl k))
       '()
@@ -73,3 +75,20 @@
 
 (define (create-counting-grouping sl gsl)
   (grouping (create-counting-grouping-helper sl gsl) (length sl)))
+
+;------------------------------ Balanced Grouping ------------------------------
+(define (create-balanced-grouping-helper lst k [sex "male"] [index 1])
+  (letrec ((eths (get-eths lst))
+        (stds (find-all-in-list (lambda (student) (equal? (send 'get-sex student) sex)) lst))
+        (half-grp (car (map (lambda (eth)
+                    (create-counting-helper stds k index)) eths))))
+    (cond ((equal? sex "stop") '())
+          ((equal? sex "female")
+           (car (cons half-grp
+                      (create-balanced-grouping-helper lst k "stop"))))
+          ((equal? sex "male")
+            (append half-grp
+                  (create-balanced-grouping-helper lst k "female" (modulo (length stds) k)))))))
+
+(define (create-balanced-grouping sl gsl)
+  (grouping (parse-associative (create-balanced-grouping-helper sl gsl) sl) (length sl)))
