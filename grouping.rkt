@@ -4,7 +4,7 @@
 (require "group.rkt")
 
 (provide grouping create-random-grouping create-counting-grouping create-counting
-         create-balanced-grouping)
+         create-balanced-grouping create-random-predicate-grouping)
 
 (define (grouping groups students-count)
   (letrec ((get-groups (lambda () groups))
@@ -38,18 +38,29 @@
               (parse-associative lst stds (+ index 1))))))
  
 ;------------------------------ Ranndom Grouping ------------------------------
-(define (create-random-grouping-helper sl gsl [index 1])
+(define (create-random-grouping-helper sl gsl [pred '()] [loop 0] [index 1])
   (let* ((randomized-list (shuffle sl))
          (new-group (first-n-elements randomized-list gsl))
          (tail (last-n-elements randomized-list gsl))
+         (add (lambda () (cons (group index new-group) (create-random-grouping-helper tail gsl pred 0 (+ index 1)))))
         )
-    (if (eq? (length sl) (length tail))
-      (cons (group index tail) '())
-      (cons (group index new-group) (create-random-grouping-helper tail gsl (+ index 1))))))
+    (cond ((eq? (length sl) (length tail)) (cons (group index tail) '()))
+          ((not (null? pred))
+           (if (< loop 100)
+               (if (pred new-group)
+                   (add)
+                   (create-random-grouping-helper sl gsl pred (+ loop 1) index))
+               (add)))
+          (else (add)))))
 
 (define (create-random-grouping sl gsl)
   (grouping (create-random-grouping-helper sl gsl) (length sl)))
-  
+
+;------------------------------ Ranndom Predicate Grouping ------------------------------
+
+(define (create-random-predicate-grouping pred sl gsl)
+  (grouping (create-random-grouping-helper sl gsl pred) (length sl)))
+
 
 ;------------------------------ Counting Grouping ------------------------------
 (define (create-counting-helper stds k [index 1])
